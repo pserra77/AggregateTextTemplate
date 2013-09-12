@@ -1,0 +1,58 @@
+﻿<#@ include file="AggregateRootTemplate.tt" #>
+<#@ include file="CommandTemplate.tt" #>
+<#@ include file="EventTemplate.tt" #>
+<#@ include file="IdTemplate.tt" #>
+<#@ import namespace="System.Text" #>
+<#+
+    // <copyright file="AggregateRootGenerator.tt" company="">
+    //  Copyright © . All Rights Reserved.
+    // </copyright>
+
+    public class AggregateRootGenerator : Generator
+    {
+        public string AggregateName;
+        public string EntityId;
+        public string GettersSetters;
+        public string[] Commands;
+        public string[] Events;
+        public string Namespace;
+
+        protected override void RunCore()
+        {
+            AggregateRootTemplate agTemplate = new AggregateRootTemplate();
+            agTemplate.AggregateName = AggregateName;
+            agTemplate.GettersSetters = GettersSetters;
+            agTemplate.EntityId = EntityId;
+            agTemplate.Namespace = Namespace;
+            agTemplate.Output.File = "Output\\" + AggregateName + ".cs";
+            //agTemplate.Output.BuildAction = "None";
+            agTemplate.Render();
+
+            IdTemplate idTemplate = new IdTemplate();
+            idTemplate.EntityId = EntityId;
+            idTemplate.AggregateName = AggregateName;
+            idTemplate.Namespace = Namespace;
+            idTemplate.Output.File = "Output\\" + EntityId + ".cs";
+            //cmTemplate.Output.BuildAction = "None";
+            idTemplate.Render();
+
+            CommandTemplate cmTemplate = new CommandTemplate();
+            cmTemplate.Commands = Commands;
+            cmTemplate.AggregateName = AggregateName;
+            cmTemplate.Namespace = Namespace;
+            cmTemplate.Output.File = "Output\\" + AggregateName + "Commands.cs";
+            //cmTemplate.Output.BuildAction = "None";
+            cmTemplate.Render();
+
+            EventTemplate evTemplate = new EventTemplate();
+            evTemplate.Events = Events;
+            evTemplate.AggregateName = AggregateName;
+            evTemplate.EntityId = EntityId;
+            evTemplate.Namespace = Namespace;
+            evTemplate.Output.File = "Output\\" + AggregateName + "Events.cs";
+            //cmTemplate.Output.BuildAction = "None";
+            evTemplate.Render();
+
+        }
+    }
+#>

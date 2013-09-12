@@ -1,0 +1,44 @@
+﻿
+<#+
+// <copyright file="AggregateRootTemplate.tt" company="">
+//  Copyright © . All Rights Reserved.
+// </copyright>
+
+public class IdTemplate : CSharpTemplate
+{
+    public string AggregateName;
+    public string Namespace;
+    public string EntityId;
+    public override string TransformText()
+	{
+		base.TransformText();
+#>
+
+<#+ #>
+using Infrastructure.Seedwork.Domain;
+
+namespace <#= Namespace #>
+{
+	public sealed class <#= EntityId #> : AbstractInt32Identity
+	{
+        public <#= EntityId #>()
+        {
+
+        }
+
+        public <#= EntityId #>(int id)
+        {
+            Id = id;
+        }
+
+        public override string GetTag()
+        {
+            return "<#= EntityId.Replace("Id","").ToLower() #>"; //TODO: change This
+        }
+	}
+}
+<#+
+        return this.GenerationEnvironment.ToString();
+	}
+}
+#>

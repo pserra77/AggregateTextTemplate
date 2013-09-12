@@ -1,0 +1,65 @@
+﻿<#@ import namespace="System.Text.RegularExpressions" #>
+<#+
+// <copyright file="DomainCommand.tt" company="">
+//  Copyright © . All Rights Reserved.
+// </copyright>
+
+public class CommandTemplate : CSharpTemplate
+{
+    public string AggregateName;
+    public string[] Commands;
+    public string Namespace;
+
+    public override string TransformText()
+	{
+        base.TransformText();
+                
+#>
+using System;
+using System.Runtime.Serialization;
+using Infrastructure.Seedwork.Domain;
+
+namespace <#= Namespace #>
+{
+    public interface I<#=AggregateName #>Command : IDomainCommand
+    {
+    }
+<#+for(int i=0; i< Commands.Length; i++) 
+{
+    //System.Diagnostics.Debugger.Break();
+    string className = Identifier(Commands[i].Substring(0, Commands[i].IndexOf("(")) + "Command");
+    string pattern = @"\w+\((?<My_Group>(?:\([^()]*\)|.)*)\)";
+    string parametersUnsplit = Regex.Match(Commands[i], pattern).Groups[1].Value;
+    string[] parametersRaw = parametersUnsplit.Split(new char[] {','});
+    string[] parameters = new string[parametersRaw.Length];
+    parametersRaw.CopyTo(parameters, 0);
+    for(int k=0; k<parametersRaw.Length; k++)
+    {
+        string paramType = parametersRaw[k].Trim().Split(new char[] {' '})[0];
+        string paramName = parametersRaw[k].Trim().Split(new char[] {' '})[1];
+        parameters[k] = paramType + " " + paramName.Substring(0, 1).ToLower() + paramName.Substring(1); 
+    }
+#>
+ 
+    [DataContract]
+	public class <#=className  #>: I<#=AggregateName #>Command
+    {
+<#+for(int j=0; j<parametersRaw.Length; j++) { #>
+        public <#=parametersRaw[j].Trim() #> { get; protected set; }
+<#+} #>
+
+        public <#=className  #>(<#=String.Join(", ", parameters) #>)
+        {
+<#+for(int m=0; m<parametersRaw.Length; m++) { #>
+            <#=parametersRaw[m].Trim().Split(new char[] {' '})[1] #> = <#=parameters[m].Trim().Split(new char[] {' '})[1] #>;
+<#+} #>
+        }
+    }
+<#+
+}#>
+}
+<#+
+    return this.GenerationEnvironment.ToString();
+}}#>
+
+

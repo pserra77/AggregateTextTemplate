@@ -1,0 +1,64 @@
+﻿
+<#+
+// <copyright file="AggregateRootTemplate.tt" company="">
+//  Copyright © . All Rights Reserved.
+// </copyright>
+
+public class AggregateRootTemplate : CSharpTemplate
+{
+    public string AggregateName;
+    public string GettersSetters;
+    public string Namespace;
+    public string EntityId;
+    public override string TransformText()
+	{
+		base.TransformText();
+#>
+
+<#+ #>
+using System;
+using Infrastructure.Seedwork.Domain;
+using log4net;
+
+namespace <#= Namespace #>
+{
+	/// <summary>
+    /// TODO
+    /// </summary>
+    /// <author>TODO</author>
+	public class <#= AggregateName #> : AbstractAggregateRootWithAudit<<#=EntityId#>, I<#=AggregateName#>Event, I<#=AggregateName#>Command>
+	{
+
+		private static readonly ILog log = LogManager.GetLogger(typeof(<#=AggregateName#>));
+
+<#+string[] getters = GettersSetters.Split(new char[] {','}); 
+for(int i=0; i<getters.Length; i++)
+{
+#>
+        public <#= getters[i].Trim() #> { get; protected set; }
+<#+} #>
+  
+        public <#= AggregateName #>()
+            : base(new NullEventPublisher())
+        {
+			if (log.IsDebugEnabled)
+            {
+                log.DebugFormat("<#= AggregateName #> Created with NullEventPublisher.");
+            }
+        }
+
+        public <#= AggregateName #>(IDomainEventPublisher eventPublisher)
+            : base(eventPublisher)
+        {
+			if (log.IsDebugEnabled)
+            {
+                log.DebugFormat("<#= AggregateName #> Created. Event Publisher : {0}.", eventPublisher);
+            }
+        }
+	}
+}
+<#+
+        return this.GenerationEnvironment.ToString();
+	}
+}
+#>

@@ -1,0 +1,67 @@
+﻿<#@ import namespace="System.Text.RegularExpressions" #>
+<#+
+// <copyright file="EventTemplate.tt" company="">
+//  Copyright © . All Rights Reserved.
+// </copyright>
+
+public class EventTemplate : CSharpTemplate
+{
+    public string AggregateName;
+    public string EntityId;
+    public string[] Events;
+    public string Namespace;
+
+    public override string TransformText()
+	{
+        base.TransformText();
+                
+#>
+using System;
+using System.Runtime.Serialization;
+using Infrastructure.Seedwork.Domain;
+
+namespace <#= Namespace #>
+{
+    public interface I<#=AggregateName #>Event : IDomainEvent<<#=EntityId #>>
+    {
+    }
+<#+for(int i=0; i< Events.Length; i++) 
+{
+    //System.Diagnostics.Debugger.Break();
+    string className = Identifier(Events[i].Substring(0, Events[i].IndexOf("(")));
+    string pattern = @"\w+\((?<My_Group>(?:\([^()]*\)|.)*)\)";
+    string parametersUnsplit = Regex.Match(Events[i], pattern).Groups[1].Value;
+    string[] parametersRaw = parametersUnsplit.Split(new char[] {','});
+    string[] parameters = new string[parametersRaw.Length];
+    parametersRaw.CopyTo(parameters, 0);
+    for(int k=0; k<parametersRaw.Length; k++)
+    {
+        string paramType = parametersRaw[k].Trim().Split(new char[] {' '})[0];
+        string paramName = parametersRaw[k].Trim().Split(new char[] {' '})[1];
+        parameters[k] = paramType + " " + paramName.Substring(0, 1).ToLower() + paramName.Substring(1); 
+    }
+#>
+
+    [DataContract]
+	public sealed class <#=className  #>: BaseEvent<<#=EntityId #>>, I<#=AggregateName #>Event
+    {
+<#+for(int j=0; j<parametersRaw.Length; j++) { #>
+        public <#=parametersRaw[j].Trim() #> { get; protected set; }
+<#+} #>
+
+        public <#=className  #>(int version, <#=String.Join(", ", parameters) #>)
+        {
+            this.AggregateVersion = version;
+<#+for(int m=0; m<parametersRaw.Length; m++) { #>
+            <#=parametersRaw[m].Trim().Split(new char[] {' '})[1] #> = <#=parameters[m].Trim().Split(new char[] {' '})[1] #>;
+<#+} #>
+        }
+    }
+<#+
+}#>
+}
+<#+
+    return this.GenerationEnvironment.ToString();
+}}#>
+
+

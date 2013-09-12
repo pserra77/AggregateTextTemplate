@@ -1,0 +1,72 @@
+<#@ template language="C#" debug="True" #>
+<#@ output extension="cs" #>
+<#@ include file="T4Toolbox.tt" #>
+<#@ include file="include\AggregateRootGenerator.tt" #>
+
+<#
+    // <copyright file="AggregateRoot.tt" company="">
+    //  Copyright © . All Rights Reserved.
+    // </copyright>
+    
+    AggregateRootGenerator ag = new AggregateRootGenerator();
+    
+
+    // **************** Set NameSpace Here **************** //
+    ag.Namespace = "CAMP.AssetManagement.Domain.Model";
+
+
+
+    // **************** Set AggregateRootName Here **************** //
+    ag.AggregateName = "Classification";
+
+
+
+    // **************** Set Id Type Here **************** //
+    ag.EntityId = "ClassificationId";
+
+    
+
+    // **************** Set Properties Here **************** //
+    //Example: 
+                //ag.GettersSetters = "string FirstName, string LastName, string MiddleName";
+				
+    ag.GettersSetters = "int ClassificationTypeId, int ClassificationName, IEnumerable<ClassificationLink> ClassificationLinks, IEnumerable<ClassificationTrackedSystem> TrackedSystems";
+
+	
+    // **************** Set Commands Here **************** //
+    //Example: 
+            //ag.Commands = new string[] 
+            //{
+                //"CreateContact(string FirstName, string LastName, string MiddleName)", 
+                //"UpdateName(string FirstName, string LastName, string MiddleName)"
+            //};
+
+    ag.Commands = new string[] 
+    {
+        "CreateClassification(ClassificationId ClassificationId, int ClassificationTypeId, string ClassificationName)",
+		"AddClassificationLink(ClassificationId FromClassificationId, ClassificationId ToClassificationId)",
+		"RemoveClassificationLink(ClassificationLinkId classificationLinkId)",
+		"AddTrackedSystemIdentifier(ClassificationTrackedSystemId ClassificationTrackedSystemId, int TrackedSystemId, string LocalIdentifier)"
+	};
+
+
+
+    // **************** Set Events Here **************** //
+    //Example: 
+            //ag.Events = new string[] 
+            //{
+                //"ContactCreated(string FirstName, string LastName, string MiddleName)", 
+                //"NameUpdated(string FirstName, string MiddleName)"
+            //};
+
+    ag.Events = new string[] 
+    {
+        "ClassificationCreated(ClassificationId ClassificationId, int ClassificationTypeId, string ClassificationName)",
+		"ClassificationLinkAdded(ClassificationId FromClassificationId, ClassificationId ToClassificationId)",
+		"ClassificationLinkRemoved(ClassificationLinkId classificationLinkId)",
+		"TrackedSystemAdded(ClassificationTrackedSystemId ClassificationTrackedSystemId, int TrackedSystemId, string LocalIdentifier)"
+    };
+
+    // ************** UNCOMMENT BEFORE RUNNING *******************
+    ag.Run();
+#>

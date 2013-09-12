@@ -1,0 +1,99 @@
+﻿
+<#+
+// <copyright file="AggregateRootTemplate.tt" company="">
+//  Copyright © . All Rights Reserved.
+// </copyright>
+
+public class AggregateRootTemplate : CSharpTemplate
+{
+    public string AggregateName;
+    public string GettersSetters;
+	public string[] Commands;
+	public string[] Events;
+    public string Namespace;
+    public string EntityId;
+    public override string TransformText()
+	{
+		base.TransformText();
+#>
+
+<#+ #>
+using System;
+using Infrastructure.Seedwork.Domain;
+
+namespace <#= Namespace #>
+{
+	public class <#= AggregateName #> : AbstractAggregateRootWithAudit<<#=EntityId#>, I<#=AggregateName#>Event, I<#=AggregateName#>Command>
+	{
+<#+string[] getters = GettersSetters.Split(new char[] {','}); 
+for(int i=0; i<getters.Length; i++)
+{
+#>
+        public <#= getters[i].Trim() #> { get; protected set; }
+<#+} #>
+  
+        public <#= AggregateName #>()
+            : base(new NullEventPublisher())
+        {
+
+        }
+
+        public <#= AggregateName #>(IDomainEventPublisher eventPublisher)
+            : base(eventPublisher)
+        {
+
+        }
+
+<#+for(int i=0; i< Commands.Length; i++) 
+{
+    //System.Diagnostics.Debugger.Break();
+    string[] methodName = new string[Commands.Length];
+	methodName[i] = Identifier(Commands[i].Substring(0, Commands[i].IndexOf("(")) + "Command")
+    
+	string pattern = @"\w+\((?<My_Group>(?:\([^()]*\)|.)*)\)";
+    string parametersUnsplit = Regex.Match(Commands[i], pattern).Groups[1].Value;
+    
+	string[] parametersRaw = parametersUnsplit.Split(new char[] {','});
+    string[] parameters = new string[parametersRaw.Length];
+	string[] parameterTypes = new string[parametersRaw.Length];
+	string[] parameterNames = new string[parametersRaw.Length];
+
+    parametersRaw.CopyTo(parameters, 0);
+    for(int k=0; k<parametersRaw.Length; k++)
+    {
+        parameterTypes[k] = parametersRaw[k].Trim().Split(new char[] {' '})[0];
+        parameterNames[k] = parametersRaw[k].Trim().Split(new char[] {' '})[1];
+        parameters[k] = paramType + " " + paramName.Substring(0, 1).ToLower() + paramName.Substring(1); 
+    }
+}#>
+
+<#+for(int i=0; i< Commands.Length; i++) { 
+#>
+		public void <#=methodName#>(<#=methodName#>Command cmd)
+		{
+			Apply(new <#=methodName#>EVENT(Version, <#+for(int m=0; m< parameters.Length; m++) { #>cmd.<#parameterNames[k] #>, <#}#>
+		}
+
+		public void When(<#=methodName#>EVENT evnt)
+		{
+			
+		}
+
+
+
+
+
+
+
+
+
+	}
+}
+
+<#}#>
+
+<#+
+        return this.GenerationEnvironment.ToString();
+	}
+}
+#>
