@@ -47,22 +47,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AggregateRootScript.tt</DependentUpon>
     </Compile>
-    <Compile Include="[Code Generation]\Output\Classification.cs" />
-    <Compile Include="[Code Generation]\Output\ClassificationCommands.cs" />
-    <Compile Include="[Code Generation]\Output\ClassificationEvents.cs" />
-    <Compile Include="[Code Generation]\Output\ClassificationId.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="[Code Generation]\AggregateRootScript.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AggregateRootScript1.cs</LastGenOutput>
-      <LastOutputs>
-.\AggregateRootScript1.cs
-.\Output\Classification.cs
-.\Output\ClassificationCommands.cs
-.\Output\ClassificationEvents.cs
-.\Output\ClassificationId.cs
-</LastOutputs>
+      <LastOutputs>.\AggregateRootScript1.cs</LastOutputs>
     </None>
     <None Include="[Code Generation]\Include\AggregateRootGenerator.tt" />
     <None Include="[Code Generation]\Include\AggregateRootTemplate.tt" />
